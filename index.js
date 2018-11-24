@@ -1,4 +1,17 @@
 import { ApolloServer, gql } from 'apollo-server';
+import { MongoClient } from 'mongodb';
+import { checkEmail, checkNickname, hashPassword, registerWithEmail} from './helpers/userHelper';
+import mongoURL from './mongo.js';
+import casual from 'casual';
+
+
+const mocks = {
+  User: () => ({
+    id: casual.uuid,
+    username: casual.username,
+
+  })
+}
 
 // This is a (sample) collection of books we'll be able to query
 // the GraphQL server for.  A more complete example might fetch
@@ -18,17 +31,31 @@ const books = [
 // which ways the data can be fetched from the GraphQL server.
 const typeDefs = gql`
   # Comments in GraphQL are defined with the hash (#) symbol.
+  type User {
+    id: ID!,
+    email: String!
+    nickname: String!
+    isVerified: Boolean!
+  }
 
-  # This "Book" type can be used in other type declarations.
-  type Book {
-    title: String
-    author: String
+  type AuthToken {
+    authToken: String!
   }
 
   # The "Query" type is the root of all GraphQL queries.
   # (A "Mutation" type will be covered later on.)
   type Query {
-    books: [Book]
+    me: User
+  }
+
+  type Mutation {
+    registerUser(input:RegisterUserInput): AuthToken
+  }
+
+  input RegisterUserInput {
+    email: String!,
+    nickname: String!,
+    password: String!
   }
 `;
 
@@ -36,17 +63,47 @@ const typeDefs = gql`
 // schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
   Query: {
-    books: () => books,
+    me: () => "Resolved",
   },
+  Mutation: {
+    registerUser: async (_, { input }, { db }) => {
+      const UserCollection = db.collection('users');
+
+      try {
+        // Check whether the requested email and nickname is available
+        const emailExist = await checkEmail(UserCollection, input.email);
+        const nicknameExist = await checkNickname(UserCollection, input.nickname);
+
+        if (!emailExist && !nicknameExist) {
+          // Passes email and nickname check, now hash password and get ready for registration
+        }
+      } catch (err) {
+        console.log(err.stacks);
+      }
+
+    }
+  }
 };
 
-// In the most basic sense, the ApolloServer can be started
-// by passing type definitions (typeDefs) and the resolvers
-// responsible for fetching the data for those types.
-const server = new ApolloServer({ typeDefs, resolvers });
+const client = new MongoClient(mongoURL, { useNewUrlParser: true });
 
-// This `listen` method launches a web-server.  Existing apps
-// can utilize middleware options, which we'll discuss later.
-server.listen().then(({ url }) => {
-  console.log(`🚀  Server ready at ${url}`);
-});
+(async function () {
+  try {
+    await client.connect();
+
+    const db = client.db('lnw');
+    const server = new ApolloServer({ 
+      typeDefs, 
+      resolvers,
+      context: {
+        db
+      }
+    });
+
+    server.listen().then(({ url }) => {
+      console.log(`🚀  Server ready at ${url}`);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+})();
