@@ -24,7 +24,8 @@
   },
   "homepage": "https://github.com/ceruberu/lnw-api#readme",
   "dependencies": {
-    "apollo-server": "^2.2.2",
+    "apollo-server-express": "^2.2.2",
+    "express": "^4.16.4",
     "graphql": "^14.0.2",
     "mongodb": "^3.1.10"
   },

@@ -1,4 +1,5 @@
-import { ApolloServer, gql } from 'apollo-server';
+import express from 'express';
+import { ApolloServer, gql } from 'apollo-server-express';
 import { MongoClient } from 'mongodb';
 import { checkEmail, checkNickname, hashPassword, registerWithEmail} from './helpers/userHelper';
 import mongoURL from './mongo.js';
@@ -73,7 +74,7 @@ const resolvers = {
         // Check whether the requested email and nickname is available
         const emailExist = await checkEmail(UserCollection, input.email);
         const nicknameExist = await checkNickname(UserCollection, input.nickname);
-
+        
         if (!emailExist && !nicknameExist) {
           // Passes email and nickname check, now hash password and get ready for registration
         }
@@ -84,6 +85,8 @@ const resolvers = {
     }
   }
 };
+
+const app = express();
 
 const client = new MongoClient(mongoURL, { useNewUrlParser: true });
 
@@ -99,10 +102,12 @@ const client = new MongoClient(mongoURL, { useNewUrlParser: true });
         db
       }
     });
+    
+    server.applyMiddleware({ app });
 
-    server.listen().then(({ url }) => {
-      console.log(`🚀  Server ready at ${url}`);
-    });
+    app.listen({ port: 4000 }, () => {
+      console.log(`Server ready at localhost:4000`)
+    })
   } catch (err) {
     console.log(err);
   }
