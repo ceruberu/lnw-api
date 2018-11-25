@@ -5,7 +5,7 @@
 
 export async function checkEmail(collection, email) {
   try {
-    const userExist = await collection.find({email: email}).limit(1).count();
+    const userExist = await collection.find({email}).limit(1).count();
     return !!userExist;
   } catch (err) {
     console.log("Error: ", err);
@@ -20,6 +20,17 @@ export async function checkNickname(collection, nickname) {
   } catch (err) {
     console.log(err);
   }
+}
+
+export async function checkFacebookID(collection, facebookID) {
+  try {
+    const user = await collection.findOne({facebookID});
+    // returns null if user is not found
+    return user;
+  } catch (err) {
+    console.log("Error: ", err);
+  }
+
 }
 
 export async function hashPassword(password) {

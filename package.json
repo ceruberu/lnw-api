@@ -4,7 +4,7 @@
   "description": "lnw api based on graphql",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node index.js  --delay 1500ms",
+    "start": "nodemon --exec babel-node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,9 +25,16 @@
   "homepage": "https://github.com/ceruberu/lnw-api#readme",
   "dependencies": {
     "apollo-server-express": "^2.2.2",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
     "graphql": "^14.0.2",
-    "mongodb": "^3.1.10"
+    "jsonwebtoken": "^8.4.0",
+    "mongodb": "^3.1.10",
+    "morgan": "^1.9.1",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "serve-static": "^1.13.2"
   },
   "devDependencies": {
     "@babel/core": "^7.1.6",
