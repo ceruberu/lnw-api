@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb';
+import { AuthenticationError } from 'apollo-server-express';
 import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from './credentials.json';
 
@@ -16,11 +18,16 @@ export function generateToken({ user }, res) {
   res.redirect('http://localhost:3000');
 }
 
-export function validateToken (token) {
-  console.log("TOKEN::",  token);
-  // const decoded = 
-  return "HEY"
-
+export function validateToken (User, clientToken, res) {
+  return jwt.verify(clientToken, TOKEN_SECRET, async (err, tokenUser) => {
+    if (err) {
+      // jwt is no longer valid
+      res.clearCookie('token');
+      throw new AuthenticationError('Token is no longer valid');
+    }
+    const user = await User.findOne({_id: ObjectId(tokenUser.id)});
+    return user;
+  });
 }
 
 // export function authMiddleware() {

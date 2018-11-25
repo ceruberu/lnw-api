@@ -97,20 +97,18 @@ const typeDefs = gql`
 // schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
   Query: {
-    me: async (_, args, { req, res }) => {
-      const tokenIsValid = await validateToken(req.cookies)
-      return {
-        displayName: "HEY"
-      }
+    me: (_, args, { db, req, res }) => {
+      const User = db.collection('users');
+      return validateToken(User, req.cookies.token, res)
     },
   },
   Mutation: {
     registerUser: async (_, { input }, { db }) => {
-      const UserCollection = db.collection('users');
+      const User = db.collection('users');
 
       try {
         // Check whether the requested email and nickname is available
-        const emailExist = await checkEmail(UserCollection, input.email);
+        const emailExist = await checkEmail(User, input.email);
 
         if (!emailExist) {
           // Passes email and nickname check, now hash password and get ready for registration
@@ -136,8 +134,6 @@ const client = new MongoClient(mongoURL, { useNewUrlParser: true });
       typeDefs, 
       resolvers, 
       context: ({req, res}) => {
-        // console.log("REQ COOKIES", req);
-        // res.setHeader( "Access-Control-Allow-Origin", 'http://localhost:3000' );
         return {
           req, res, db
         }
