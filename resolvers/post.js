@@ -20,10 +20,9 @@ export default {
     }
   },
   Post: {
-    author: async ({authorId}, args, { mongo }) => {
-      const author = await mongo.User.findOne({_id: ObjectId(authorId)});
-      return author;
-    },
+    author: async ({authorId}, args, { loaders }) => 
+      loaders.userLoader.load(authorId)
+    ,
     comments: async (_, args, context) => {
       // console.log("POST_COMMENTS::_",_);
       // console.log("POST_COMMENTS::args",args);
@@ -45,7 +44,7 @@ export default {
         const newPost = await mongo.Post.insertOne({
           ...input,
           authorId: user._id,
-          createdAt: new Date()
+          createdAt: Date.now()
         });
 
         return {

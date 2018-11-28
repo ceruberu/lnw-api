@@ -115,7 +115,7 @@ const client = new MongoClient(mongoURL, { useNewUrlParser: true });
           const newUserResponse = await mongo.User.insertOne({
             displayName: profile.displayName,
             facebookID: profile.id,
-            createdAt: new Date()
+            createdAt: Date.now()
           });
           const newUser = newUserResponse.ops[0];
           return done(null, { user: newUser });

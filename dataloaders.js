@@ -1,7 +1,9 @@
+import { keyBy } from "lodash";
 import Dataloader from "dataloader";
 
-async function batchPosts(Post, keys) {
-  const posts = await Post.find({_id: {$in: keys}}).toArray();
+async function batchPosts(Post, postIds) {
+  const posts = await Post.find({_id: {$in: postIds}}).toArray();
+  return posts;
 }
 
 async function getCommentsUsingPostId(Comment, postId) {
@@ -9,10 +11,22 @@ async function getCommentsUsingPostId(Comment, postId) {
   return comments;
 }
 
-const buildDataLoaders = ({Post, Comment}) => ({
+async function batchUsers(User, userIds) {
+  // userIds = [ 1, 3, 5, 9 ...., 1, 1, 1]
+  const users = await User.find({_id: {$in: userIds}}).toArray();
+  const groupUsers= keyBy(users, '_id');
+  // groupUsers = {1: { ...}, 3: {...}}
+  return userIds.map(userId => groupUsers[userId] || {});
+}
+
+const buildDataLoaders = ({User, Post, Comment}) => ({
+  userLoader: new Dataloader(
+    id => batchUsers(User, id),
+    {cachedkeyFn: id => id.toString()}
+  ),
   postLoader: new Dataloader(
-    keys => batchPosts(Post, keys),
-    {cachedkeyFn: key => key.toString()}
+    id => batchPosts(Post, id),
+    {cachedkeyFn: id => id.toString()}
   ),
   commentLoader: new Dataloader(
     postId => getCommentsUsingPostId(Comment, postId),
