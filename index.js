@@ -13,7 +13,7 @@ import { makeExecutableSchema } from 'graphql-tools';
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import buildDataLoaders from './dataloaders';
 
-import { authMiddleware, generateToken, validateToken } from './helpers/authHelper';
+import { generateToken } from './helpers/authHelper';
 import { checkEmail, checkNickname, checkFacebookID, hashPassword, registerWithEmail} from './helpers/userHelper';
 import mongoURL from './mongo.js';
 
@@ -115,7 +115,7 @@ const client = new MongoClient(mongoURL, { useNewUrlParser: true });
           const newUserResponse = await mongo.User.insertOne({
             displayName: profile.displayName,
             facebookID: profile.id,
-            createdAt: Date.now()
+            createdAt: new Date()
           });
           const newUser = newUserResponse.ops[0];
           return done(null, { user: newUser });

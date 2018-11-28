@@ -45,7 +45,7 @@ export default {
         const newPost = await mongo.Post.insertOne({
           ...input,
           authorId: user._id,
-          createdAt: Date.now()
+          createdAt: new Date()
         });
 
         return {
