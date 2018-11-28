@@ -14,7 +14,7 @@ export default {
         // _id: ObjectId(input.id)
       // });
     },
-    postFeed: async (_, { limit, skip, filter }, { mongo, req, res, loaders}) => {
+    postFeed: async (_, { limit, skip, filter }, { mongo }) => {
       const postFeed = await mongo.Post.find().limit(limit).skip(skip).toArray();
       return postFeed;
     }
