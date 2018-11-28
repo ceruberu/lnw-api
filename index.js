@@ -8,13 +8,30 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser'; 
 import serveStatic from 'serve-static';
 import cors from 'cors';
-import casual from 'casual';
+import path from 'path';
+import { makeExecutableSchema } from 'graphql-tools';
+import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
+import buildDataLoaders from './dataloaders';
 
-import { authMiddleware, generateToken, validateToken } from './auth';
+import { authMiddleware, generateToken, validateToken } from './helpers/authHelper';
 import { checkEmail, checkNickname, checkFacebookID, hashPassword, registerWithEmail} from './helpers/userHelper';
 import mongoURL from './mongo.js';
 
 import { TOKEN_SECRET ,FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } from './credentials.json';
+
+const types = fileLoader(path.join(__dirname, './schema'));
+const typeDefs = mergeTypes(types);
+
+const resolversArray = fileLoader(path.join(__dirname, './resolvers'));
+const resolvers = mergeResolvers(resolversArray);
+
+
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers
+});
+
+
 
 passport.serializeUser(function(user, done) {
   done(null, user.id);
@@ -51,76 +68,6 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use('/auth', authRouter);
-// app.use(authMiddleware());
-
-
-const mocks = {
-  User: () => ({
-    id: casual.uuid,
-    username: casual.username,
-
-  })
-}
-
-// Type definitions define the "shape" of your data and specify
-// which ways the data can be fetched from the GraphQL server.
-const typeDefs = gql`
-  # Comments in GraphQL are defined with the hash (#) symbol.
-  type User {
-    facebookID: String
-    createdAt: String!
-    displayName: String!
-  }
-
-  type AuthToken {
-    authToken: String!
-  }
-
-  # The "Query" type is the root of all GraphQL queries.
-  # (A "Mutation" type will be covered later on.)
-  type Query {
-    me: User
-  }
-
-  type Mutation {
-    registerUser(input:RegisterUserInput): AuthToken
-  }
-
-  input RegisterUserInput {
-    email: String!,
-    nickname: String!,
-    password: String!
-  }
-`;
-
-// Resolvers define the technique for fetching the types in the
-// schema.  We'll retrieve books from the "books" array above.
-const resolvers = {
-  Query: {
-    me: (_, args, { db, req, res }) => {
-      const User = db.collection('users');
-      return validateToken(User, req.cookies.token, res)
-    },
-  },
-  Mutation: {
-    registerUser: async (_, { input }, { db }) => {
-      const User = db.collection('users');
-
-      try {
-        // Check whether the requested email and nickname is available
-        const emailExist = await checkEmail(User, input.email);
-
-        if (!emailExist) {
-          // Passes email and nickname check, now hash password and get ready for registration
-        }
-      } catch (err) {
-        console.log(err.stacks);
-      }
-
-    }
-  }
-};
-
 
 
 const client = new MongoClient(mongoURL, { useNewUrlParser: true });
@@ -130,12 +77,20 @@ const client = new MongoClient(mongoURL, { useNewUrlParser: true });
     await client.connect();
 
     const db = client.db('lnw');
+    const mongo = {
+      User: db.collection('users'),
+      Post: db.collection('posts'),
+      Comment: db.collection('comments')
+    };
+
     const server = new ApolloServer({ 
-      typeDefs, 
-      resolvers, 
+      schema,
       context: ({req, res}) => {
         return {
-          req, res, db
+          req,
+          res,
+          mongo,
+          loaders: buildDataLoaders(mongo)
         }
       }
     });
@@ -153,12 +108,11 @@ const client = new MongoClient(mongoURL, { useNewUrlParser: true });
       callbackURL: "http://localhost:4000/auth/facebook/callback"
     },
     async (accessToken, refreshToken, profile, done) => {
-      const User = db.collection('users');
-      const user = await checkFacebookID(User, profile.id);
+      const user = await checkFacebookID(mongo.User, profile.id);
 
       if (!user) {
         try {
-          const newUserResponse = await User.insertOne({
+          const newUserResponse = await mongo.User.insertOne({
             displayName: profile.displayName,
             facebookID: profile.id,
             createdAt: Date.now()

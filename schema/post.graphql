@@ -1,0 +1,48 @@
+type Comment {
+  _id: ID!
+  postId: ID!
+  author: User!
+  content: String!
+  createdAt: String!
+  isEdited: Boolean!
+}
+
+type Post {
+  _id: ID!
+  author: User!
+  type: String!
+  title: String!
+  content: String!
+  createdAt:String!
+  comments: [Comment]
+}
+
+type Query {
+  post(input:PostInput): Post
+  # posts(input: PostsInput): [Post]
+  postFeed(filter:String, skip: Int!, limit: Int!): [Post]
+}
+
+type Mutation {
+  addPost(input:AddPostInput): Post
+}
+
+input CommentsInput {
+  postId: String!
+}
+
+input PostInput {
+  postId: String!
+}
+
+input PostsInput {
+  limit: Int,
+  skip: Int,
+  filter: String
+}
+
+input AddPostInput {
+  content: String!,
+  title: String!,
+  type: String! 
+}
