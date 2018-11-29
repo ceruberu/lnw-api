@@ -1,5 +1,9 @@
+import { PubSub } from 'graphql-subscriptions';
+import { withFilter } from 'apollo-server-express';
 import { ObjectId } from 'mongodb';
 import { validateToken } from '../helpers/authHelper';
+
+const pubsub = new PubSub();
 
 export default {
   Query: {
@@ -23,27 +27,18 @@ export default {
           authorId: ObjectId(user._id),
           createdAt: Date.now()
         });
-
+        
+        // Publish to the pubsub channel;
+        pubsub.publish('commentAdded', { commentAdded: newComment.ops[0], postId: postId});
         return newComment.ops[0];
       }
     }
-    // addPost: async (_, { type, title, content }, { mongo, req, res }) => {
-
-      // const user = await validateToken(mongo.User, req.cookies.token, res);
-
-    //   if (user) {
-    //     const newPost = await mongo.Post.insertOne({
-    //       type,
-    //       title,
-    //       content,
-    //       authorId: ObjectId(user._id),
-    //       createdAt: Date.now()
-    //     });
-
-    //     return {
-    //       _id: newPost.ops[0]._id.toString()
-    //     }
-    //   }
-    // }
+  },
+  Subscription: {
+    commentAdded: {
+      subscribe: withFilter(() => pubsub.asyncIterator('commentAdded'),(payload, variables) => {
+        return payload.commentAdded.postId.toString() === variables.postId.toString();
+      })
+    }
   }
 };

@@ -8,9 +8,13 @@ type Comment {
 }
 
 type Query {
-  comments(postId: ObjectID): [Comment]
+  comments(postId: ObjectID!): [Comment]
 }
 
 type Mutation {
-  addComment(postId: ObjectID, content: String!): Comment
+  addComment(postId: ObjectID!, content: String!): Comment
+}
+
+type Subscription {
+  commentAdded(postId: ObjectID!): Comment
 }

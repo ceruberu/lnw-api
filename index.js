@@ -1,5 +1,6 @@
 import express from 'express';
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
+import http from 'http';
 import { MongoClient } from 'mongodb';
 import passport from 'passport';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
@@ -13,11 +14,14 @@ import { makeExecutableSchema } from 'graphql-tools';
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import buildDataLoaders from './dataloaders';
 
+
 import { generateToken } from './helpers/authHelper';
-import { checkEmail, checkNickname, checkFacebookID, hashPassword, registerWithEmail} from './helpers/userHelper';
+import { checkFacebookID } from './helpers/userHelper';
 import mongoURL from './mongo.js';
 
-import { TOKEN_SECRET ,FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } from './credentials.json';
+import { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } from './credentials.json';
+
+const PORT = 4000;
 
 const types = fileLoader(path.join(__dirname, './schema'));
 const typeDefs = mergeTypes(types);
@@ -130,8 +134,13 @@ const client = new MongoClient(mongoURL, { useNewUrlParser: true });
 
     app.use(passport.initialize());
 
-    app.listen({ port: 4000 }, () => {
-      console.log(`Server ready at localhost:4000 ${server.graphqlPath}`)
+    const httpServer = http.createServer(app);
+    server.installSubscriptionHandlers(httpServer);
+
+    httpServer.listen(PORT, () => {
+      console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
+      console.log(`🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`)
+
     })
   } catch (err) {
     console.log(err);
