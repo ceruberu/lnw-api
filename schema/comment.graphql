@@ -1,0 +1,16 @@
+type Comment {
+  _id: ObjectID!
+  postId: ObjectID!
+  author: User!
+  content: String!
+  createdAt: String!
+  isEdited: Boolean!
+}
+
+type Query {
+  comments(postId: ObjectID): [Comment]
+}
+
+type Mutation {
+  addComment(postId: ObjectID, content: String!): Comment
+}

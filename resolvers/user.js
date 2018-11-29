@@ -12,5 +12,9 @@ export default {
         throw err
       }
     }
+  },
+  User: {
+    _id: ({_id}) => _id,
+    nickname: ({nickname}) => nickname
   }
 };
