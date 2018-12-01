@@ -1,0 +1,20 @@
+type Vote {
+  _id: ObjectID!
+  userId: ObjectID!
+
+  # PostId / CommentId
+  postId: ObjectID
+  commentId: ObjectID
+  # 1 or -1
+  # 0 if voted up / down and then cancled
+  vote: Int!
+}
+
+type Query {
+  myVote(postId: ObjectID, commentId: ObjectID): Vote
+}
+
+type Mutation {
+  addPostVote(id: ObjectID!, vote:Int!): Post
+  addCommentVote(id: ObjectID!, vote:Int!): Comment
+}

@@ -5,11 +5,13 @@ type Post {
   title: String!
   content: String!
   createdAt: String!
+  voteUpCount: Int!
+  voteDownCount: Int!
+  myVote: Vote
 }
 
 type Query {
   post(_id: ObjectID!): Post
-  # posts(input: PostsInput): [Post]
   postFeed(filter:String, skip: Int!, limit: Int!): [Post]
 }
 

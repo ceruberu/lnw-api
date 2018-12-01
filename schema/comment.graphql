@@ -5,6 +5,8 @@ type Comment {
   content: String!
   createdAt: String!
   isEdited: Boolean!
+  voteUpCount: Int!
+  voteDownCount: Int!
 }
 
 type Query {

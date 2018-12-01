@@ -84,7 +84,8 @@ const client = new MongoClient(mongoURL, { useNewUrlParser: true });
     const mongo = {
       User: db.collection('users'),
       Post: db.collection('posts'),
-      Comment: db.collection('comments')
+      Comment: db.collection('comments'),
+      Vote: db.collection('votes')
     };
 
     const server = new ApolloServer({ 
