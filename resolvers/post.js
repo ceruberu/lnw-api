@@ -1,17 +1,33 @@
 import { ObjectId } from "mongodb";
 import { validateToken } from "../helpers/authHelper";
 
+const filters = {
+  "newest" : {
+    createdAt: -1
+  }
+};
+
 export default {
   Query: {
     post: async (_, { _id }, { mongo }) => {
       const post = await mongo.Post.findOne({ _id });
       return post;
     },
-    postFeed: async (_, { limit, skip, filter }, { mongo }) => {
+    postFeed: async (_, { limit, skip, filter, type }, { mongo }) => {
+    
+    filter = filter || "newest";
+    const sorter = filters[filter] || filters.newest;
+    
+    const finder = {};
+    type = type || false;
+    if(type) finder.type = type;
+
+
       const postFeed = await mongo.Post
-        .find()
+        .find(finder)
         .limit(limit)
         .skip(skip)
+        .sort(filters[filter])
         .toArray();
       return postFeed;
     }

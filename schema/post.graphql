@@ -12,7 +12,7 @@ type Post {
 
 type Query {
   post(_id: ObjectID!): Post
-  postFeed(filter:String, skip: Int!, limit: Int!): [Post]
+  postFeed(filter:String, skip: Int!, limit: Int! type: String): [Post]
 }
 
 type Mutation {
