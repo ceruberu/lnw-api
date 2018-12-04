@@ -70,17 +70,12 @@ app.get(
   generateToken
 );
 
-// passport.authenticate('line', {
-//   failureRedirect: '/login',
-//   session: false
-// })
-// generateToken
-
 app.use(
   cors({
     origin: [
+      "https://ceruberu.com",
+      "https://www.ceruberu.com",
       "http://localhost:3000",
-      "http://localhost",
       "http://localhost:4000",
       "htpp://localhost:4000/graphql"
     ],

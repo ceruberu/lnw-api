@@ -4,12 +4,12 @@
   "description": "lnw api based on graphql",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node ./src/index.js",
+    "start": "NODE_ENV='dev' nodemon --exec babel-node ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf build && mkdir build",
     "build-server": "babel -d ./build ./src -s --copy-files",
     "build": "npm run clean && npm run build-server",
-    "start-server": "node ./build/index.js"
+    "start-server": "NODE_ENV='production' node ./build/index.js"
   },
   "repository": {
     "type": "git",

@@ -7,6 +7,10 @@ const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
 const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const PORT = process.env.PORT || 4000;
+const isProduction = process.env.NODE_ENV === "production";
+
+const ADDRESS = isProduction ? "https://api.ceruberu.com" : `http://localhost:${PORT}`;
 
 export default (passport, mongo) => {
   passport.use(
@@ -14,7 +18,7 @@ export default (passport, mongo) => {
       {
         clientID: FACEBOOK_APP_ID,
         clientSecret: FACEBOOK_APP_SECRET,
-        callbackURL: "http://localhost:4000/auth/facebook/callback"
+        callbackURL: `${ADDRESS}/auth/facebook/callback`
       },
       async (accessToken, refreshToken, profile, done) => {
         const user = await checkSocialID(mongo.User, "facebook", profile.id);
@@ -33,7 +37,7 @@ export default (passport, mongo) => {
       {
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:4000/auth/google/callback"
+        callbackURL: `${ADDRESS}/auth/google/callback`
       },
       async (accessToken, refreshToken, profile, done) => {
         const user = await checkSocialID(mongo.User, "google", profile.id);

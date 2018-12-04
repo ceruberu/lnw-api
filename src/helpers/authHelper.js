@@ -2,6 +2,8 @@ import { ObjectId } from "mongodb";
 import { AuthenticationError } from "apollo-server-express";
 import jwt from "jsonwebtoken";
 
+const isProduction = process.env.NODE_ENV === "production";
+const ADDRESS = isProduction ? "https://ceruberu.com/" : `http://localhost:${3000}/`;
 const TOKEN_SECRET = process.env.TOKEN_SECRET;
 
 export function generateToken({ user }, res) {
@@ -21,7 +23,7 @@ export function generateToken({ user }, res) {
 
   // TO-DO add secure:true based on build stage
   res.cookie("token", token, { httpOnly: true });
-  res.redirect("http://localhost:3000");
+  res.redirect(ADDRESS);
 }
 
 export async function validateToken(User, clientToken, res) {
