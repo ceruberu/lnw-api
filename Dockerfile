@@ -10,5 +10,6 @@ RUN yarn install
 
 RUN yarn build
 
+ENV PORT 4000
 EXPOSE 4000
-CMD ["node", "index.js"]
+CMD ["node", "./build/index.js"]

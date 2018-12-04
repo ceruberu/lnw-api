@@ -17,7 +17,7 @@ import buildDataLoaders from "./dataloaders";
 import { generateToken } from "./helpers/authHelper";
 import mongoURL from "./mongo.js";
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 const types = fileLoader(path.join(__dirname, "./schema"));
 const typeDefs = mergeTypes(types);
@@ -137,10 +137,10 @@ const client = new MongoClient(mongoURL, { useNewUrlParser: true });
 
     httpServer.listen(PORT, () => {
       console.log(
-        `🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`
+        `🚀 Server listening on port: ${PORT}` 
       );
       console.log(
-        `🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`
+        `🚀 Subscriptions ready at ws:${PORT}/${server.subscriptionsPath}`
       );
     });
   } catch (err) {
