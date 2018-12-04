@@ -9,6 +9,7 @@
     ]
   ],
   "plugins": [
-    "import-graphql"
+    "import-graphql",
+    "inline-dotenv"
   ]
 }

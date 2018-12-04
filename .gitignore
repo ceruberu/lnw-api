@@ -3,6 +3,8 @@
 
 .vscode
 
+.env
+
 credentials.json
 
 # Elastic Beanstalk Files

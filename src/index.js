@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import http from "http";
@@ -136,9 +138,7 @@ const client = new MongoClient(mongoURL, { useNewUrlParser: true });
     server.installSubscriptionHandlers(httpServer);
 
     httpServer.listen(PORT, () => {
-      console.log(
-        `🚀 Server listening on port: ${PORT}` 
-      );
+      console.log(`🚀 Server listening on port: ${PORT}`);
       console.log(
         `🚀 Subscriptions ready at ws:${PORT}/${server.subscriptionsPath}`
       );

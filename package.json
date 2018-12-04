@@ -29,9 +29,11 @@
   "homepage": "https://github.com/ceruberu/lnw-api#readme",
   "dependencies": {
     "apollo-server-express": "^2.2.2",
+    "babel-plugin-inline-dotenv": "^1.2.0",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
     "dataloader": "^1.4.0",
+    "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "graphql": "^14.0.2",
     "graphql-subscriptions": "^1.0.0",

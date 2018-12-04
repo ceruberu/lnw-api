@@ -1,7 +1,8 @@
 import { ObjectId } from "mongodb";
 import { AuthenticationError } from "apollo-server-express";
 import jwt from "jsonwebtoken";
-import { TOKEN_SECRET } from "../../credentials.json";
+
+const TOKEN_SECRET = process.env.TOKEN_SECRET;
 
 export function generateToken({ user }, res) {
   const expiresIn = "7d";

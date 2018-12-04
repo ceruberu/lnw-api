@@ -3,12 +3,10 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 import { checkSocialID, registerNewUser } from "./helpers/userHelper";
 
-import {
-  FACEBOOK_APP_ID,
-  FACEBOOK_APP_SECRET,
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET
-} from "../credentials.json";
+const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
+const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 export default (passport, mongo) => {
   passport.use(
